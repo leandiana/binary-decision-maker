@@ -19,6 +19,7 @@ const server = http.createServer((req, res) => {
     });
   }
   else if (page == '/decide') {
+    // if both options probided then choose one randomly
     if('option1' in params && 'option2' in params){
         res.writeHead(200, {'Content-Type': 'application/json'});
         const objToJson = {
@@ -26,6 +27,7 @@ const server = http.createServer((req, res) => {
         }
         res.end(JSON.stringify(objToJson));
     } else {
+        //if any or both options missing return the only parameter or a default message
         res.writeHead(200, {'Content-Type': 'application/json'});
         const objToJson = {
           result: ('option1' in params)? params['option1'] : 

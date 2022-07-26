@@ -25,7 +25,15 @@ const server = http.createServer((req, res) => {
           result: (Math.random() < 0.5)? params['option1'] : params['option2']
         }
         res.end(JSON.stringify(objToJson));
-      }
+    } else {
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        const objToJson = {
+          result: ('option1' in params)? params['option1'] : 
+                  ('option2' in params)? params['option2'] :
+                  'NO OPTIONS PROVIDED'
+        }
+        res.end(JSON.stringify(objToJson));
+    }
   }
   else if (page == '/public/style.css'){
     fs.readFile('public/style.css', function(err, data) {

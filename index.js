@@ -1,20 +1,48 @@
-const http = require('http')
+const http = require('http');
 const fs = require('fs')
-const path = require('path')
+const url = require('url');
+const querystring = require('querystring');
+// const figlet = require('figlet')
 
-http.createServer( (request, response)=>{
-    if(request.url === '/'){
-        fs.readFile(
-            path.join(__dirname, 'public', 'index.html'),
-            (err, content)=>{
-                if(err)throw err;
-                response.writeHead(200, {'Content-Type': 'text/html'})
-                response.end(content)
-            }
-            )
-        
-    }
-    response.writeHead(200, {'Content-Type': 'text/html'})
-    response.write( (Math.random() > 0.5)? '1' : '0' /*CONTENT*/)
-    response.end()
-    }).listen(8000)
+const server = http.createServer((req, res) => {
+  //get the path of the page requested
+  const page = url.parse(req.url).pathname;
+  // get the parameters inside the query
+  const params = querystring.parse(url.parse(req.url).query);
+
+  // respond according to the page requested
+  if (page == '/') {
+    fs.readFile('public/index.html', function(err, data) {
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.write(data);
+      res.end();
+    });
+  }
+  else if (page == '/decide') {
+    if('option1' in params && 'option2' in params){
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        const objToJson = {
+          result: (Math.random() < 0.5)? params['option1'] : params['option2']
+        }
+        res.end(JSON.stringify(objToJson));
+      }
+  }
+  else if (page == '/public/style.css'){
+    fs.readFile('public/style.css', function(err, data) {
+      res.write(data);
+      res.end();
+    });
+  }else if (page == '/public/main.js'){
+    fs.readFile('public/main.js', function(err, data) {
+      res.writeHead(200, {'Content-Type': 'text/javascript'});
+      res.write(data);
+      res.end();
+    });
+  }else{
+    res.writeHead(200, {'Content-Type': 'text/html'});
+      res.write('ERROR 404');
+      res.end();
+  }
+});
+
+server.listen(8000);
